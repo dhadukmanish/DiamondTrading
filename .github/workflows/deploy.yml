@@ -1,0 +1,45 @@
+# Deploys to the Hostinger VPS on every push to main.
+# Needs repo secrets: VPS_HOST, VPS_USER, VPS_PASSWORD, DB_PASSWORD, JWT_SECRET, APP_URL
+name: Deploy to VPS
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy over SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          password: ${{ secrets.VPS_PASSWORD }}
+          command_timeout: 30m
+          script: |
+            set -e
+            if ! command -v docker >/dev/null; then
+              apt-get update -qq && apt-get install -y -qq docker.io docker-compose-v2 git
+              systemctl enable --now docker
+            fi
+            if [ ! -d /opt/erp/.git ]; then
+              git clone https://github.com/${{ github.repository }}.git /opt/erp
+            fi
+            cd /opt/erp && git fetch --all && git reset --hard origin/main
+            # use port 80 if free, else 8085 (something else already serves 80 on this VPS)
+            if ss -ltn | grep -q ':80 ' && ! docker compose -f docker-compose.prod.yml ps web 2>/dev/null | grep -q Up; then WEB_PORT=8085; else WEB_PORT=80; fi
+            echo "WEB_PORT=$WEB_PORT"; ss -ltnp | grep ':80 ' || true
+            cat > .env <<ENV
+            DB_USER=erp
+            DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+            DB_NAME=erp
+            JWT_SECRET=${{ secrets.JWT_SECRET }}
+            APP_URL=${{ secrets.APP_URL }}
+            WEB_PORT=$WEB_PORT
+            ENV
+            docker compose -f docker-compose.prod.yml up -d --build
+            sleep 8
+            docker compose -f docker-compose.prod.yml exec -T api npx drizzle-kit push --force
+            docker compose -f docker-compose.prod.yml exec -T api npx tsx src/db/seed.ts
+            docker image prune -f
+            echo "Deployed: $(git rev-parse --short HEAD)"

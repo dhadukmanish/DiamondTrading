@@ -1,0 +1,15 @@
+{
+  "name": "diamond-erp",
+  "private": true,
+  "packageManager": "pnpm@9.12.0",
+  "scripts": {
+    "dev": "pnpm -r --parallel run dev",
+    "build": "pnpm -r run build",
+    "typecheck": "pnpm -r run typecheck",
+    "db:push": "pnpm --filter @erp/api run db:push",
+    "db:seed": "pnpm --filter @erp/api run db:seed"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3"
+  }
+}

@@ -1,0 +1,16 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html { font-size: 14px; }
+  body { @apply font-sans antialiased; }
+  input, select, textarea { @apply outline-none; }
+  :focus-visible { @apply ring-2 ring-brand/40 rounded; }
+}
+@layer components {
+  .field { @apply w-full h-10 px-3 rounded-md border border-line bg-white text-ink placeholder:text-ink-faint focus:border-brand; }
+  .label { @apply block mb-1 text-[13px] font-medium text-ink; }
+  .req::after { content: ' *'; @apply text-red-500; }
+  .card { @apply bg-white rounded-lg border border-line; }
+}
