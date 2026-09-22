@@ -1,0 +1,63 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+.pnp.*
+
+# Build output
+dist/
+build/
+out/
+*.tsbuildinfo
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.crt
+secrets/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Test / coverage
+coverage/
+.nyc_output/
+.vitest/
+
+# Caches
+.cache/
+.temp/
+.tmp/
+.eslintcache
+.vite/
+vite.config.ts.timestamp-*
+
+# Editors / OS
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.example.json
+.DS_Store
+Thumbs.db
+*.swp
+
+# Database / local infra artifacts
+pgdata/
+*.sqlite
+*.sqlite3
+*.dump
+*.sql.gz
+
+# Drizzle local metadata (generated migrations ARE committed)
+apps/api/drizzle/meta/_journal.json.bak
+
+# Uploads / generated assets
+uploads/
+storage/
